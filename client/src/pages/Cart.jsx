@@ -105,89 +105,129 @@ const validData = data.filter(item => item.productId !== null);
     const totalPrice = validData.reduce((preve,curr)=> preve + ((curr?.productId?.sellingPrice || 0) * curr.quantity) ,0)
 
     return (
-    <div className='container mx-auto'>
-        
-        <div className='text-center text-lg my-3'>
-            {data.length === 0 && !loading && (
-                <p className='bg-white py-5'>No Data</p>
-            )}
-        </div>
+    <div className="container mx-auto p-4">
 
-        <div className='flex flex-col lg:flex-row gap-10 lg:justify-between p-4'>   
-            {/***view product */}
-            <div className='w-full max-w-3xl'>
-                {loading ? (
-                    loadingCart?.map((el,index) => (
-                        <div key={el+"Add To Cart Loading"+index} className='w-full bg-slate-200 h-32 my-2 border border-slate-300 animate-pulse rounded'></div>
-                    )) 
-                ) : (
-                    validData.map((product,index)=>{
-                        if(!product?.productId) return null   // ✅ skip invalid/deleted products
-                        return(
-                            <div key={product?._id+"Add To Cart"} className='w-full bg-white h-32 my-2 border border-slate-300 rounded grid grid-cols-[128px,1fr]'>
-                                <div className='w-32 h-32 bg-slate-200'>
-                                    <img src={product?.productId?.productImage?.[0]} alt='product' className='w-full h-full object-scale-down mix-blend-multiply' />
-                                </div>
-                                <div className='px-4 py-2 relative'>
-                                    {/**delete product */}
-                                    <div 
-                                        className='absolute right-0 text-red-600 rounded-full p-2 hover:bg-red-600 hover:text-white cursor-pointer' 
-                                        onClick={()=>deleteCartProduct(product?._id)}>
-                                        <MdDelete/>
-                                    </div>
+  {data.length === 0 && !loading && (
+    <p className="bg-white py-5 text-center">No Data</p>
+  )}
 
-                                    <h2 className='text-lg lg:text-xl text-ellipsis line-clamp-1'>
-                                        {product?.productId?.productName || "Unknown Product"}
-                                    </h2>
-                                    <p className='capitalize text-slate-500'>
-                                        {product?.productId?.category || "Category not available"}
-                                    </p>
-                                    <div className='flex items-center justify-between'>
-                                        <p className='text-red-600 font-medium text-lg'>
-                                            {displayINRCurrency(product?.productId?.sellingPrice || 0)}
-                                        </p>
-                                        <p className='text-slate-600 font-semibold text-lg'>
-                                            {displayINRCurrency((product?.productId?.sellingPrice || 0) * product?.quantity)}
-                                        </p>
-                                    </div>
-                                    <div className='flex items-center gap-3 mt-1'>
-                                        <button 
-                                            className='border border-red-600 text-red-600 hover:bg-red-600 hover:text-white w-6 h-6 flex justify-center items-center rounded ' 
-                                            onClick={()=>decraseQty(product?._id,product?.quantity)}>-</button>
-                                        <span>{product?.quantity}</span>
-                                        <button 
-                                            className='border border-red-600 text-red-600 hover:bg-red-600 hover:text-white w-6 h-6 flex justify-center items-center rounded ' 
-                                            onClick={()=>increaseQty(product?._id,product?.quantity)}>+</button>
-                                    </div>
-                                </div>    
-                            </div>
-                        )
-                    })
-                )}
+  <div className="flex flex-col lg:flex-row gap-10">
+
+    {/* LEFT SIDE - PRODUCTS */}
+    <div className="w-full lg:w-2/3 space-y-4">
+
+      {loading ? (
+        loadingCart.map((_, index) => (
+          <div
+            key={index}
+            className="h-40 bg-slate-200 animate-pulse rounded-xl"
+          />
+        ))
+      ) : (
+        validData.map((product) => {
+          if (!product?.productId) return null;
+
+          return (
+            <div
+              key={product._id}
+              className="bg-white border rounded-xl p-5 flex gap-6 items-center"
+            >
+              {/* IMAGE */}
+              <div className="w-40 h-40 bg-slate-100 rounded-lg flex items-center justify-center">
+                <img
+                  src={product.productId.productImage?.[0]}
+                  alt="product"
+                  className="object-contain h-full"
+                />
+              </div>
+
+              {/* INFO */}
+              <div className="flex-1">
+                <h2 className="text-2xl font-semibold">
+                  {product.productId.productName}
+                </h2>
+
+                <p className="text-sm text-slate-500 capitalize">
+                  {product.productId.category}
+                </p>
+
+                <p className="text-slate-600 mt-2 text-sm">
+                  {product.productId.description || "No description available"}
+                </p>
+
+                <div className="mt-3">
+                  <p className="text-red-600 font-semibold text-xl">
+                    {displayINRCurrency(product.productId.sellingPrice)}
+                  </p>
+                  <p className="text-slate-600 text-sm">
+                    Total:{" "}
+                    {displayINRCurrency(
+                      product.productId.sellingPrice * product.quantity
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              {/* ACTIONS */}
+              <div className="flex flex-col justify-between items-end h-full">
+                <button
+                  onClick={() => deleteCartProduct(product._id)}
+                  className="text-red-600 hover:bg-red-100 p-2 rounded-full"
+                >
+                  <MdDelete />
+                </button>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => decraseQty(product._id, product.quantity)}
+                    className="w-9 h-9 border border-red-600 rounded-lg text-red-600 hover:bg-red-600 hover:text-white"
+                  >
+                    −
+                  </button>
+
+                  <span className="text-lg font-medium">
+                    {product.quantity}
+                  </span>
+
+                  <button
+                    onClick={() => increaseQty(product._id, product.quantity)}
+                    className="w-9 h-9 border border-red-600 rounded-lg text-red-600 hover:bg-red-600 hover:text-white"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
             </div>
-
-            {/***summary  */}
-            <div className='mt-5 lg:mt-0 w-full max-w-sm'>
-                {loading ? (
-                    <div className='h-36 bg-slate-200 border border-slate-300 animate-pulse'></div>
-                ) : (
-                    <div className='h-36 bg-white'>
-                        <h2 className='text-white bg-red-600 px-4 py-1'>Summary</h2>
-                        <div className='flex items-center justify-between px-4 gap-2 font-medium text-lg text-slate-600'>
-                            <p>Quantity</p>
-                            <p>{totalQty}</p>
-                        </div>
-                        <div className='flex items-center justify-between px-4 gap-2 font-medium text-lg text-slate-600'>
-                            <p>Total Price</p>
-                            <p>{displayINRCurrency(totalPrice)}</p>    
-                        </div>
-                        <button className='bg-blue-600 p-2 text-white w-full mt-2'>Payment</button>
-                    </div>
-                )}
-            </div>
-        </div>
+          );
+        })
+      )}
     </div>
-  )
-}
+
+    {/* RIGHT SIDE - SUMMARY */}
+    <div className="w-full lg:w-1/3">
+      <div className="bg-white rounded-xl border p-5 sticky top-24">
+        <h2 className="text-white bg-red-600 px-4 py-2 rounded">
+          Summary
+        </h2>
+
+        <div className="flex justify-between mt-4 text-lg">
+          <span>Quantity</span>
+          <span>{totalQty}</span>
+        </div>
+
+        <div className="flex justify-between text-lg mt-2">
+          <span>Total</span>
+          <span>{displayINRCurrency(totalPrice)}</span>
+        </div>
+
+        <button className="w-full bg-blue-600 text-white py-2 mt-4 rounded-lg">
+          Payment
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+    )}
 
 export default Cart
