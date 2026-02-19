@@ -8,7 +8,7 @@ const router = require('./routes')
 
 const app = express()
 app.use(cors({
-    origin : "https://shopsphere-frontend-3m9u.onrender.com",
+    origin : process.env.FRONTEND_URL,
     credentials : true
 }))
 
