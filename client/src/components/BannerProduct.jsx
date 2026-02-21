@@ -61,8 +61,8 @@ const BannerProduct = () => {
     },[currentImage])
 
   return (
-    <div className='container mx-auto px-4 rounded '>
-        <div className='h-56 md:h-72 w-full bg-slate-200 relative'>
+    <div className='w-full px-4 rounded '>
+        <div className='h-45 md:h-72 w-full bg-slate-200 relative'>
 
                 <div className='absolute z-10 h-full w-full md:flex items-center hidden '>
                     <div className=' flex justify-between w-full text-2xl'>
@@ -86,12 +86,32 @@ const BannerProduct = () => {
 
 
                 {/* ===== MOBILE VERSION (IMPROVED) ===== */}
-<div className="md:hidden relative w-full aspect-[4/3] overflow-hidden bg-white">
+<div className="h-45 md:hidden relative w-full aspect-[4/3] overflow-hidden bg-white">
 
   {/* Slider wrapper */}
   <div
     className="flex w-full h-full transition-transform duration-700 ease-in-out"
     style={{ transform: `translateX(-${currentImage * 100}%)` }}
+    onTouchStart={(e) => {
+      window.touchStartX = e.touches[0].clientX
+    }}
+    onTouchEnd={(e) => {
+      const touchEndX = e.changedTouches[0].clientX
+      const diff = window.touchStartX - touchEndX
+
+      // swipe threshold
+      if (diff > 50) {
+        // swipe left → next
+        if (currentImage < mobileImages.length - 1) {
+          setCurrentImage((prev) => prev + 1)
+        }
+      } else if (diff < -50) {
+        // swipe right → previous
+        if (currentImage > 0) {
+          setCurrentImage((prev) => prev - 1)
+        }
+      }
+    }}
   >
     {mobileImages.map((imageURL, index) => (
       <div
@@ -101,7 +121,8 @@ const BannerProduct = () => {
         <img
           src={imageURL}
           alt="banner"
-          className="w-full h-full object-contain"
+          className="w-full h-full "
+          draggable={false}
         />
       </div>
     ))}
