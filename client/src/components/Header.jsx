@@ -6,16 +6,14 @@ import { FaRegCircleUser } from "react-icons/fa6"
 import { FaShoppingCart } from "react-icons/fa"
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import SummaryApi from '../common'
-import { toast } from 'react-toastify'
-import { setUserDetails } from '../Store/userSlice'
-import ROLE from '../common/role'
+
 import Context from '../context'
+
 
 const Header = () => {
   const user = useSelector(state => state?.user?.user)
   const dispatch = useDispatch()
-  const [menuDisplay, setMenuDisplay] = useState(false)
+ // const [menuDisplay, setMenuDisplay] = useState(false)
   const context = useContext(Context)
   const navigate = useNavigate()
 
@@ -24,24 +22,6 @@ const Header = () => {
   const searchQuery = URLSearch.get("q") || ""
   const [search, setSearch] = useState(searchQuery)
 
-  const handleLogout = async () => {
-    const fetchData = await fetch(SummaryApi.logout_user.url, {
-      method: SummaryApi.logout_user.method,
-      credentials: 'include'
-    })
-
-    const data = await fetchData.json()
-
-    if (data.success) {
-      toast.success(data.message)
-      dispatch(setUserDetails(null))
-      navigate("/")
-    }
-
-    if (data.error) {
-      toast.error(data.message)
-    }
-  }
 
   // ONLY update input value
   const handleSearchChange = (e) => {
@@ -56,97 +36,89 @@ const Header = () => {
   }
 
   return (
-    <header className='h-16 shadow-md bg-white z-40'>
-      <div className='h-full container mx-auto flex items-center px-4 justify-between'>
+  <header className="h-14 sm:h-16 bg-white shadow-md sticky top-0 z-40">
+    <div className="h-full w-full flex items-center justify-between px-3 sm:px-6 gap-3">
 
-        <div>
-          <Link to={"/"}>
-            <img src={shopsphere} className="w-[120px] h-[60px]" />
-          </Link>
-        </div>
+      {/* ================= LEFT : LOGO ================= */}
+      <Link to="/" className="flex items-center gap-2 shrink-0">
+        <img
+          src={shopsphere}
+          alt="ShopSphere"
+          className="w-[80px] sm:w-[110px] md:w-[130px] h-auto"
+        />
+        <span className="hidden sm:block font-semibold text-lg md:text-xl text-gray-800">
+          ShopSphere
+        </span>
+      </Link>
 
-        {/* SEARCH BAR */}
-        <div className='hidden lg:flex items-center w-full justify-between max-w-sm border rounded-full focus-within:shadow pl-2'>
+      {/* ================= CENTER : SEARCH ================= */}
+      <div className="flex-1 flex justify-center">
+        <div className="flex items-center w-full max-w-[150px] sm:max-w-xs md:max-w-md lg:max-w-lg border rounded-full overflow-hidden focus-within:shadow">
           <input
-            type='text'
-            placeholder='search product here...'
-            className='w-full outline-none'
+            type="text"
+            placeholder="Search products..."
+            className="w-full px-3 py-1.5 text-sm sm:text-base outline-none"
             value={search}
             onChange={handleSearchChange}
           />
-          <div
+          <button
             onClick={handleSearchClick}
-            className='cursor-pointer text-lg min-w-[50px] h-8 bg-red-600 flex items-center justify-center rounded-r-full text-white'
+            className="min-w-[36px] sm:min-w-[44px] bg-red-600 h-full flex items-center justify-center text-white"
           >
             <GrSearch />
-          </div>
+          </button>
         </div>
+      </div>
 
-        <div className='flex items-center gap-7'>
+      {/* ================= RIGHT : USER / CART / LOGIN ================= */}
+      <div className="flex items-center gap-3 sm:gap-6 shrink-0">
 
-          <div className='relative flex justify-center'>
-            {user?._id && (
-              <div
-                className='text-3xl cursor-pointer relative flex justify-center'
-                onClick={() => setMenuDisplay(prev => !prev)}
-              >
-                {user?.profilePic ? (
-                  <img src={user?.profilePic} className='w-10 h-10 rounded-full' alt={user?.name} />
-                ) : (
-                  <FaRegCircleUser />
-                )}
-              </div>
-            )}
+        {/* USER ICON */}
+        {user?._id && (
+          
+          <div className="relative">
+            <div
+              className="cursor-pointer"
+              
+            ><Link to="/user-details">
+              {user?.profilePic ? (
+                
+                <img
+                  src={user.profilePic}
+                  alt={user.name}
+                  className="w-9 h-9 rounded-full object-cover"
+                />
+              ) : (
+                <FaRegCircleUser className="text-2xl" />
+              )}</Link>
+            </div>
 
-            {menuDisplay && (
-              <div className='absolute bg-white bottom-0 top-11 h-fit p-2 shadow-lg rounded'>
-                <nav>
-                  {user?.role === ROLE.ADMIN && (
-                    <Link
-                      to={"/admin-panel/all-products"}
-                      className='whitespace-nowrap hidden md:block hover:bg-slate-100 p-2'
-                      onClick={() => setMenuDisplay(prev => !prev)}
-                    >
-                      Admin Panel
-                    </Link>
-                  )}
-                </nav>
-              </div>
-            )}
+            
           </div>
+        )}
 
-          {user?._id && (
-            <Link to={"/cart"} className='text-2xl relative'>
-              <span><FaShoppingCart /></span>
-              <div className='bg-red-600 text-white w-5 h-5 rounded-full p-1 flex items-center justify-center absolute -top-2 -right-3'>
-                <p className='text-sm'>{context?.cartProductCount}</p>
-              </div>
-            </Link>
-          )}
+        {/* CART */}
+        {user?._id && (
+          <Link to="/cart" className="relative text-xl">
+            <FaShoppingCart />
+            <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+              {context?.cartProductCount}
+            </span>
+          </Link>
+        )}
 
-          <div>
-            {user?._id ? (
-              <button
-                onClick={handleLogout}
-                className='px-3 py-1 rounded-full text-white bg-red-600 hover:bg-red-700'
-              >
-                Logout
-              </button>
-            ) : (
-              <Link
-                to={"/login"}
-                className='px-3 py-1 rounded-full text-white bg-red-600 hover:bg-red-700'
-              >
-                Login
-              </Link>
-            )}
-          </div>
-
-        </div>
+        {/* LOGIN (HIDDEN AFTER LOGIN) */}
+        {!user?._id && (
+          <Link
+            to="/login"
+            className="px-2 py-1 sm:px-4 sm:py-1.5 text-sm sm:text-base rounded-full text-white bg-red-600 hover:bg-red-700"
+          >
+            Login
+          </Link>
+        )}
 
       </div>
-    </header>
-  )
-}
-
-export default Header
+    </div>
+  </header>
+)}
+export default Header;

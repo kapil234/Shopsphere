@@ -1,106 +1,135 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
-import fetchCategoryWiseProduct from '../helpers/fetchCategoryWiseProduct'
-import displayINRCurrency from '../helpers/displayCurrency'
-import { FaAngleLeft, FaAngleRight } from 'react-icons/fa6'
-import { Link } from 'react-router-dom'
-import addToCart from '../helpers/addToCart'
-import Context from '../context'
+import React, { useContext, useEffect, useRef, useState } from "react";
+import fetchCategoryWiseProduct from "../helpers/fetchCategoryWiseProduct";
+import displayINRCurrency from "../helpers/displayCurrency";
+import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
+import { Link } from "react-router-dom";
+import addToCart from "../helpers/addToCart";
+import Context from "../context";
 
-const HorizontalCardProduct = ({category, heading}) => {
-    const [data,setData] = useState([])
-    const [loading,setLoading] = useState(true)
-    const loadingList = new Array(13).fill(null)
+const HorizontalCardProduct = ({ category, heading }) => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const loadingList = new Array(8).fill(null);
 
-    const [scroll,setScroll] = useState(0)
-    const scrollElement = useRef()
+  const scrollElement = useRef();
+  const { fetchUserAddToCart } = useContext(Context);
 
+  const handleAddToCart = async (e, id) => {
+    e.preventDefault(); // prevent link navigation
+    await addToCart(e, id);
+    fetchUserAddToCart();
+  };
 
-    const { fetchUserAddToCart } = useContext(Context)
+  const fetchData = async () => {
+    setLoading(true);
+    const categoryProduct = await fetchCategoryWiseProduct(category);
+    setLoading(false);
+    setData(categoryProduct?.data);
+  };
 
-    const handleAddToCart = async(e,id)=>{
-       await addToCart(e,id)
-       fetchUserAddToCart()
-    }
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-    const fetchData = async() =>{
-        setLoading(true)
-        const categoryProduct = await fetchCategoryWiseProduct(category)
-        setLoading(false)
+  const scrollRight = () => {
+    scrollElement.current.scrollLeft += 400;
+  };
 
-        console.log("horizontal data",categoryProduct.data)
-        setData(categoryProduct?.data)
-    }
+  const scrollLeft = () => {
+    scrollElement.current.scrollLeft -= 400;
+  };
 
-    useEffect(()=>{
-        fetchData()
-    },[])
+ return (
+  <div className="w-full px-4 my-10 relative overflow-hidden">
 
-    const scrollRight = () =>{
-        scrollElement.current.scrollLeft += 300
-    }
-    const scrollLeft = () =>{
-        scrollElement.current.scrollLeft -= 300
-    }
+    {/* Heading */}
+    <h2 className="text-xl md:text-2xl font-semibold mb-6 text-center">
+      {heading}
+    </h2>
 
+    {/* Arrows */}
+    <button
+      onClick={scrollLeft}
+      className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 bg-white shadow-md rounded-full w-10 h-10 items-center justify-center z-10"
+    >
+      <FaAngleLeft />
+    </button>
 
-  return (
-    <div className='container mx-auto px-4 my-6 relative'>
+    <button
+      onClick={scrollRight}
+      className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 bg-white shadow-md rounded-full w-10 h-10 items-center justify-center z-10"
+    >
+      <FaAngleRight />
+    </button>
 
-            <h2 className='text-2xl font-semibold py-4'>{heading}</h2>
+    {/* Scroll Container */}
+    <div
+      ref={scrollElement}
+      className="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-hide"
+    >
+      {data.map((product, index) => (
+        <Link
+          key={product?._id || index}
+          to={"/product/" + product?._id}
+          className="
+            min-w-[48%]        /* 2 cards mobile */
+            md:min-w-[45%]     /* 2 cards tablet */
+            lg:min-w-[350px]   /* 3 clean cards desktop */
+            bg-white rounded-2xl shadow-sm
+            hover:shadow-lg transition
+            flex flex-col lg:flex-row
+            snap-start overflow-hidden
+          "
+        >
+          {/* IMAGE */}
+          <div className="
+            h-40
+            lg:h-auto
+            lg:w-[45%]
+            bg-gray-100
+            flex items-center justify-center
+          ">
+            <img
+              src={product?.productImage[0]}
+              alt={product?.productName}
+              className="h-full object-contain p-6 hover:scale-105 transition duration-300"
+            />
+          </div>
 
-                
-           <div className='flex items-center gap-4 md:gap-6 overflow-scroll scrollbar-none transition-all' ref={scrollElement}>
+          {/* CONTENT */}
+          <div className="p-5 flex flex-col justify-between flex-1">
 
-            <button  className='bg-white shadow-md rounded-full p-1 absolute left-0 text-lg hidden md:block' onClick={scrollLeft}><FaAngleLeft/></button>
-            <button  className='bg-white shadow-md rounded-full p-1 absolute right-0 text-lg hidden md:block' onClick={scrollRight}><FaAngleRight/></button> 
+            <div>
+              <h2 className="text-base font-semibold">
+                {product?.productName}
+              </h2>
 
-           {   loading ? (
-                loadingList.map((product,index)=>{
-                    return(
-                        
-                        <div key={index} className='w-full min-w-[280px] md:min-w-[320px] max-w-[280px] md:max-w-[320px] h-36 bg-white rounded-sm shadow flex'>
-                            <div className='bg-slate-200 h-full p-4 min-w-[120px] md:min-w-[145px] animate-pulse'>
+              <p className="text-sm text-gray-500 capitalize mt-1">
+                {product?.category}
+              </p>
 
-                            </div>
-                            <div className='p-4 grid w-full gap-2'>
-                                <h2 className='font-medium text-base md:text-lg text-ellipsis line-clamp-1 text-black bg-slate-200 animate-pulse p-1 rounded-full'></h2>
-                                <p className='capitalize text-slate-500 p-1 bg-slate-200 animate-pulse rounded-full'></p>
-                                <div className='flex gap-3 w-full'>
-                                    <p className='text-red-600 font-medium p-1 bg-slate-200 w-full animate-pulse rounded-full'></p>
-                                    <p className='text-slate-500 line-through p-1 bg-slate-200 w-full animate-pulse rounded-full'></p>
-                                </div>
-                                <button className='text-sm  text-white px-3 py-0.5 rounded-full w-full bg-slate-200 animate-pulse'></button>
-                            </div>
-                        </div>
-                    )
-                })
-           ) : (
-            data.map((product,index)=>{
-                return(
-                    <Link key={product?._id || index} to={"product/"+product?._id} className='w-full min-w-[280px] md:min-w-[320px] max-w-[280px] md:max-w-[320px] h-36 bg-white rounded-sm shadow flex'>
-                        <div className='bg-slate-200 h-full p-4 min-w-[120px] md:min-w-[145px]'>
-                            <img src={product.productImage[0]} className='object-scale-down h-full hover:scale-110 transition-all'/>
-                        </div>
-                        <div className='p-4 grid'>
-                            <h2 className='font-medium text-base md:text-lg text-ellipsis line-clamp-1 text-black'>{product?.productName}</h2>
-                            <p className='capitalize text-slate-500'>{product?.category}</p>
-                            <div className='flex gap-3'>
-                                <p className='text-red-600 font-medium'>{ displayINRCurrency(product?.sellingPrice) }</p>
-                                <p className='text-slate-500 line-through'>{ displayINRCurrency(product?.price)  }</p>
-                            </div>
-                            <button className='text-sm bg-red-600 hover:bg-red-700 text-white px-3 py-0.5 rounded-full' onClick={(e)=>handleAddToCart(e,product?._id)}>Add to Cart</button>
-                        </div>
-                    </Link>
-                )
-            })
-           )
-               
-            }
-           </div>
-            
+              <div className="flex items-center gap-3 mt-3">
+                <p className="text-red-600 font-bold text-lg">
+                  {displayINRCurrency(product?.sellingPrice)}
+                </p>
+                <p className="text-gray-400 text-sm line-through">
+                  {displayINRCurrency(product?.price)}
+                </p>
+              </div>
+            </div>
 
+            <button
+              onClick={(e) => handleAddToCart(e, product?._id)}
+              className="mt-5 bg-red-600 hover:bg-red-700 text-white text-sm py-2 rounded-full transition"
+            >
+              Add to Cart
+            </button>
+
+          </div>
+        </Link>
+      ))}
     </div>
-  )
-}
+  </div>
+);}
 
 export default HorizontalCardProduct;

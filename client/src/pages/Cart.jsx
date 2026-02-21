@@ -3,12 +3,14 @@ import SummaryApi from '../common'
 import Context from '../context'
 import displayINRCurrency from '../helpers/displayCurrency'
 import { MdDelete } from "react-icons/md";
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const Cart = () => {
     const [data,setData] = useState([])
     const [loading,setLoading] = useState(false)
     const context = useContext(Context)
     const loadingCart = new Array(4).fill(null)
+    const navigate=useNavigate();
 
     const fetchData = async () => {
     const response = await fetch(SummaryApi.addToCartProductView.url, {
@@ -105,89 +107,127 @@ const validData = data.filter(item => item.productId !== null);
     const totalPrice = validData.reduce((preve,curr)=> preve + ((curr?.productId?.sellingPrice || 0) * curr.quantity) ,0)
 
     return (
-    <div className='container mx-auto'>
-        
-        <div className='text-center text-lg my-3'>
-            {data.length === 0 && !loading && (
-                <p className='bg-white py-5'>No Data</p>
-            )}
+  <div className="w-full px-4">
+
+    {data.length === 0 && !loading && (
+      <p className="bg-white py-4 text-center rounded-lg">No Data</p>
+    )}
+
+    <div className="flex flex-col lg:flex-row gap-4">
+
+      {/* LEFT SIDE */}
+      <div className="w-full lg:w-2/3 space-y-3">
+
+        {loading ? (
+          loadingCart.map((_, index) => (
+            <div
+              key={index}
+              className="h-24 bg-slate-200 animate-pulse rounded-lg"
+            />
+          ))
+        ) : (
+          validData.map((product) => {
+            if (!product?.productId) return null;
+
+            return (
+              <div
+                key={product._id}
+                onClick={() => navigate(`/product/${product.productId._id}`)}
+                className="bg-white border rounded-xl p-3 flex items-center gap-3 shadow-sm"
+              >
+                {/* IMAGE */}
+                <div className="w-20 h-20 bg-slate-100 rounded-lg flex items-center justify-center overflow-hidden">
+                  <img
+                    src={product.productId.productImage?.[0]}
+                    alt="product"
+                    className="w-full h-full object-contain p-2"
+                  />
+                </div>
+
+                {/* INFO */}
+                <div className="flex-1 leading-tight">
+                  <h2 className="text-sm font-semibold line-clamp-1">
+                    {product.productId.productName}
+                  </h2>
+
+                  <p className="text-xs text-slate-500 capitalize">
+                    {product.productId.category}
+                  </p>
+
+                  <p className="text-xs text-slate-600 line-clamp-1">
+                    {product.productId.description || "No description available"}
+                  </p>
+
+                  <p className="text-red-600 font-semibold text-sm mt-1">
+                    {displayINRCurrency(product.productId.sellingPrice)}
+                  </p>
+
+                  <p className="text-[11px] text-slate-500">
+                    Total:{" "}
+                    {displayINRCurrency(
+                      product.productId.sellingPrice * product.quantity
+                    )}
+                  </p>
+                </div>
+
+                {/* ACTIONS */}
+                <div className="flex flex-col items-center gap-2">
+                  <button
+                    onClick={() => deleteCartProduct(product._id)}
+                    className="text-red-600 text-sm"
+                  >
+                    <MdDelete />
+                  </button>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => decraseQty(product._id, product.quantity)}
+                      className="w-6 h-6 border border-red-600 rounded text-red-600 text-sm"
+                    >
+                      −
+                    </button>
+
+                    <span className="text-sm">{product.quantity}</span>
+
+                    <button
+                      onClick={() => increaseQty(product._id, product.quantity)}
+                      className="w-6 h-6 border border-red-600 rounded text-red-600 text-sm"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* RIGHT SIDE */}
+      <div className="w-full lg:w-1/3">
+        <div className="bg-white rounded-xl border p-4 sticky top-24 shadow-sm">
+          <h2 className="text-white bg-red-600 px-3 py-1 rounded text-sm text-center">
+            Summary
+          </h2>
+
+          <div className="flex justify-between mt-3 text-sm">
+            <span>Quantity</span>
+            <span>{totalQty}</span>
+          </div>
+
+          <div className="flex justify-between mt-2 text-sm">
+            <span>Total</span>
+            <span>{displayINRCurrency(totalPrice)}</span>
+          </div>
+
+          <button className="w-full bg-blue-600 text-white py-2 mt-4 rounded-lg text-sm">
+            Payment
+          </button>
         </div>
+      </div>
 
-        <div className='flex flex-col lg:flex-row gap-10 lg:justify-between p-4'>   
-            {/***view product */}
-            <div className='w-full max-w-3xl'>
-                {loading ? (
-                    loadingCart?.map((el,index) => (
-                        <div key={el+"Add To Cart Loading"+index} className='w-full bg-slate-200 h-32 my-2 border border-slate-300 animate-pulse rounded'></div>
-                    )) 
-                ) : (
-                    validData.map((product,index)=>{
-                        if(!product?.productId) return null   // ✅ skip invalid/deleted products
-                        return(
-                            <div key={product?._id+"Add To Cart"} className='w-full bg-white h-32 my-2 border border-slate-300 rounded grid grid-cols-[128px,1fr]'>
-                                <div className='w-32 h-32 bg-slate-200'>
-                                    <img src={product?.productId?.productImage?.[0]} alt='product' className='w-full h-full object-scale-down mix-blend-multiply' />
-                                </div>
-                                <div className='px-4 py-2 relative'>
-                                    {/**delete product */}
-                                    <div 
-                                        className='absolute right-0 text-red-600 rounded-full p-2 hover:bg-red-600 hover:text-white cursor-pointer' 
-                                        onClick={()=>deleteCartProduct(product?._id)}>
-                                        <MdDelete/>
-                                    </div>
-
-                                    <h2 className='text-lg lg:text-xl text-ellipsis line-clamp-1'>
-                                        {product?.productId?.productName || "Unknown Product"}
-                                    </h2>
-                                    <p className='capitalize text-slate-500'>
-                                        {product?.productId?.category || "Category not available"}
-                                    </p>
-                                    <div className='flex items-center justify-between'>
-                                        <p className='text-red-600 font-medium text-lg'>
-                                            {displayINRCurrency(product?.productId?.sellingPrice || 0)}
-                                        </p>
-                                        <p className='text-slate-600 font-semibold text-lg'>
-                                            {displayINRCurrency((product?.productId?.sellingPrice || 0) * product?.quantity)}
-                                        </p>
-                                    </div>
-                                    <div className='flex items-center gap-3 mt-1'>
-                                        <button 
-                                            className='border border-red-600 text-red-600 hover:bg-red-600 hover:text-white w-6 h-6 flex justify-center items-center rounded ' 
-                                            onClick={()=>decraseQty(product?._id,product?.quantity)}>-</button>
-                                        <span>{product?.quantity}</span>
-                                        <button 
-                                            className='border border-red-600 text-red-600 hover:bg-red-600 hover:text-white w-6 h-6 flex justify-center items-center rounded ' 
-                                            onClick={()=>increaseQty(product?._id,product?.quantity)}>+</button>
-                                    </div>
-                                </div>    
-                            </div>
-                        )
-                    })
-                )}
-            </div>
-
-            {/***summary  */}
-            <div className='mt-5 lg:mt-0 w-full max-w-sm'>
-                {loading ? (
-                    <div className='h-36 bg-slate-200 border border-slate-300 animate-pulse'></div>
-                ) : (
-                    <div className='h-36 bg-white'>
-                        <h2 className='text-white bg-red-600 px-4 py-1'>Summary</h2>
-                        <div className='flex items-center justify-between px-4 gap-2 font-medium text-lg text-slate-600'>
-                            <p>Quantity</p>
-                            <p>{totalQty}</p>
-                        </div>
-                        <div className='flex items-center justify-between px-4 gap-2 font-medium text-lg text-slate-600'>
-                            <p>Total Price</p>
-                            <p>{displayINRCurrency(totalPrice)}</p>    
-                        </div>
-                        <button className='bg-blue-600 p-2 text-white w-full mt-2'>Payment</button>
-                    </div>
-                )}
-            </div>
-        </div>
     </div>
-  )
-}
+  </div>
+);}
 
 export default Cart

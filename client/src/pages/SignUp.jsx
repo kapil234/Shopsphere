@@ -3,7 +3,8 @@ import loginIcons from '../assest/signin.gif'
 import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
 import { Link, useNavigate } from 'react-router-dom';
-import imageTobase64 from '../helpers/imageTobase64';
+//import imageTobase64 from '../helpers/imageTobase64';
+import uploadImage from '../helpers/uploadImage';
 import SummaryApi from '../common';
 import { toast } from 'react-toastify';
 
@@ -33,7 +34,7 @@ const SignUp = () => {
   const handleUploadPic = async(e) =>{
     const file = e.target.files[0]
     
-    const imagePic = await imageTobase64(file)
+    const imagePic = await uploadImage(file)
     
     setData((preve)=>{
       return{
@@ -77,7 +78,7 @@ const SignUp = () => {
 
   return (
     <section id='signup'>
-        <div className='mx-auto container p-4'>
+        <div className='w-full px-4'>
 
             <div className='bg-white p-5 w-full max-w-sm mx-auto'>
 

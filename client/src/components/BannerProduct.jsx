@@ -85,18 +85,29 @@ const BannerProduct = () => {
               </div>
 
 
-                {/**mobile version */}
-                <div className='flex h-full w-full overflow-hidden md:hidden'>
-                {
-                        mobileImages.map((imageURl,index)=>{
-                            return(
-                            <div className='w-full h-full min-w-full min-h-full transition-all' key={imageURl} style={{transform : `translateX(-${currentImage * 100}%)`}}>
-                                <img src={imageURl} className='w-full h-full object-cover'/>
-                            </div>
-                            )
-                        })
-                }
-              </div>
+                {/* ===== MOBILE VERSION (IMPROVED) ===== */}
+<div className="md:hidden relative w-full aspect-[4/3] overflow-hidden bg-white">
+
+  {/* Slider wrapper */}
+  <div
+    className="flex w-full h-full transition-transform duration-700 ease-in-out"
+    style={{ transform: `translateX(-${currentImage * 100}%)` }}
+  >
+    {mobileImages.map((imageURL, index) => (
+      <div
+        key={index}
+        className="w-full h-full flex-shrink-0 flex items-center justify-center"
+      >
+        <img
+          src={imageURL}
+          alt="banner"
+          className="w-full h-full object-contain"
+        />
+      </div>
+    ))}
+  </div>
+
+</div>
 
 
         </div>

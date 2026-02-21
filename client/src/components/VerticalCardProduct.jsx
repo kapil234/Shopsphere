@@ -43,63 +43,91 @@ const VerticalCardProduct = ({category, heading}) => {
 
 
   return (
-    <div className='container mx-auto px-4 my-6 relative'>
+  <div className="w-full px-3 my-6 relative">
 
-            <h2 className='text-2xl font-semibold py-4'>{heading}</h2>
+    {/* Heading */}
+    <h2 className="text-lg md:text-2xl font-semibold mb-4">
+      {heading}
+    </h2>
 
-                
-           <div className='flex items-center gap-4 md:gap-6 overflow-x-scroll scrollbar-none transition-all' ref={scrollElement}>
+    {/* Desktop Arrows */}
+    <button
+      onClick={scrollLeft}
+      className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 bg-white shadow-md rounded-full w-9 h-9 items-center justify-center z-10"
+    >
+      <FaAngleLeft />
+    </button>
 
-            <button  className='bg-white shadow-md rounded-full p-1 absolute left-0 text-lg hidden md:block' onClick={scrollLeft}><FaAngleLeft/></button>
-            <button  className='bg-white shadow-md rounded-full p-1 absolute right-0 text-lg hidden md:block' onClick={scrollRight}><FaAngleRight/></button> 
+    <button
+      onClick={scrollRight}
+      className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 bg-white shadow-md rounded-full w-9 h-9 items-center justify-center z-10"
+    >
+      <FaAngleRight />
+    </button>
 
-           {
+    {/* Scroll Container */}
+    <div
+      ref={scrollElement}
+      className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-none"
+    >
+      {loading
+        ? loadingList.map((_, index) => (
+            <div
+              key={index}
+              className="min-w-[48%] md:min-w-[300px] bg-white rounded-xl shadow-sm p-3 snap-start"
+            >
+              <div className="h-36 bg-slate-200 rounded-lg animate-pulse"></div>
+              <div className="mt-3 h-4 bg-slate-200 rounded animate-pulse"></div>
+              <div className="mt-2 h-4 bg-slate-200 rounded animate-pulse w-2/3"></div>
+              <div className="mt-3 h-8 bg-slate-200 rounded-full animate-pulse"></div>
+            </div>
+          ))
+        : data.map((product, index) => (
+            <Link
+              key={product?._id || index}
+              to={"product/" + product?._id}
+              className="min-w-[48%] md:min-w-[300px] bg-white rounded-xl shadow-sm hover:shadow-md transition snap-start flex flex-col"
+            >
+              {/* Image Section */}
+              <div className="h-36 bg-gray-100 rounded-t-xl flex items-center justify-center p-3">
+                <img
+                  src={product?.productImage[0]}
+                  alt={product?.productName}
+                  className="h-full object-contain hover:scale-105 transition duration-300"
+                />
+              </div>
 
-                loading ? (
-                    loadingList.map((product,index)=>{
-                        return(
-                            <div key={index} className='w-full min-w-[280px]  md:min-w-[320px] max-w-[280px] md:max-w-[320px]  bg-white rounded-sm shadow '>
-                                <div className='bg-slate-200 h-48 p-4 min-w-[280px] md:min-w-[145px] flex justify-center items-center animate-pulse'>
-                                </div>
-                                <div className='p-4 grid gap-3'>
-                                    <h2 className='font-medium text-base md:text-lg text-ellipsis line-clamp-1 text-black p-1 py-2 animate-pulse rounded-full bg-slate-200'></h2>
-                                    <p className='capitalize text-slate-500 p-1 animate-pulse rounded-full bg-slate-200  py-2'></p>
-                                    <div className='flex gap-3'>
-                                        <p className='text-red-600 font-medium p-1 animate-pulse rounded-full bg-slate-200 w-full  py-2'></p>
-                                        <p className='text-slate-500 line-through p-1 animate-pulse rounded-full bg-slate-200 w-full  py-2'></p>
-                                    </div>
-                                    <button className='text-sm  text-white px-3  rounded-full bg-slate-200  py-2 animate-pulse'></button>
-                                </div>
-                            </div>
-                        )
-                    })
-                ) : (
-                    data.map((product,index)=>{
-                        return(
-                            <Link key={product?._id || index} to={"product/"+product?._id} className='w-full min-w-[280px]  md:min-w-[320px] max-w-[280px] md:max-w-[320px]  bg-white rounded-sm shadow '>
-                                <div className='bg-slate-200 h-48 p-4 min-w-[280px] md:min-w-[145px] flex justify-center items-center'>
-                                    <img src={product.productImage[0]} className='object-scale-down h-full hover:scale-110 transition-all mix-blend-multiply'/>
-                                </div>
-                                <div className='p-4 grid gap-3'>
-                                    <h2 className='font-medium text-base md:text-lg text-ellipsis line-clamp-1 text-black'>{product?.productName}</h2>
-                                    <p className='capitalize text-slate-500'>{product?.category}</p>
-                                    <div className='flex gap-3'>
-                                        <p className='text-red-600 font-medium'>{ displayINRCurrency(product?.sellingPrice) }</p>
-                                        <p className='text-slate-500 line-through'>{ displayINRCurrency(product?.price)  }</p>
-                                    </div>
-                                    <button className='text-sm bg-red-600 hover:bg-red-700 text-white px-3 py-0.5 rounded-full' onClick={(e)=>handleAddToCart(e,product?._id)}>Add to Cart</button>
-                                </div>
-                            </Link>
-                        )
-                    })
-                )
-                
-            }
-           </div>
-            
+              {/* Content */}
+              <div className="p-3 flex flex-col flex-1">
+                <h2 className="text-sm font-medium text-gray-800 line-clamp-1">
+                  {product?.productName}
+                </h2>
 
+                <p className="text-xs text-gray-500 capitalize">
+                  {product?.category}
+                </p>
+
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-red-600 font-semibold text-sm">
+                    {displayINRCurrency(product?.sellingPrice)}
+                  </p>
+                  <p className="text-gray-400 text-xs line-through">
+                    {displayINRCurrency(product?.price)}
+                  </p>
+                </div>
+
+                <button
+                  onClick={(e) =>
+                    handleAddToCart(e, product?._id)
+                  }
+                  className="mt-3 bg-red-600 hover:bg-red-700 text-white text-xs py-2 rounded-full transition"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </Link>
+          ))}
     </div>
-  )
-}
-
+  </div>
+);}
 export default VerticalCardProduct;
