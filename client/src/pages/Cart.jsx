@@ -107,6 +107,7 @@ const validData = data.filter(item => item.productId !== null);
     const totalPrice = validData.reduce((preve,curr)=> preve + ((curr?.productId?.sellingPrice || 0) * curr.quantity) ,0)
 
     return (
+
   <div className="w-full px-4">
 
     {data.length === 0 && !loading && (
@@ -229,5 +230,8 @@ const validData = data.filter(item => item.productId !== null);
     </div>
   </div>
 );}
+
+    
+
 
 export default Cart
