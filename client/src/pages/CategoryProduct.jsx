@@ -25,6 +25,7 @@ const CategoryProduct = () => {
     urlCategoryListObject
   );
   const [filterCategoryList, setFilterCategoryList] = useState([]);
+  const [openFilter, setOpenFilter] = useState(false);
 
   // Fetch Products
   const fetchData = async (categories) => {
@@ -101,92 +102,210 @@ const CategoryProduct = () => {
 
   return (
     <div className="w-full px-4 md:px-8 py-6">
-      <div className="flex flex-col md:flex-row gap-6">
-        
-        {/* FILTER SIDEBAR */}
-        <aside className="md:w-64 w-full bg-white p-5 border rounded-xl shadow-sm md:sticky md:top-24 h-fit">
-          
-          {/* SORT */}
-          <h3 className="text-sm font-semibold uppercase text-gray-500 border-b pb-2">
-            Sort By
-          </h3>
+  <div className="flex flex-col md:flex-row gap-6">
 
-          <form className="text-sm flex flex-col gap-3 py-4">
-            <label className="flex items-center gap-3 cursor-pointer">
+    {/* ================= MOBILE FILTER BUTTON ================= */}
+    <div className="md:hidden flex justify-between items-center">
+      <p className="font-semibold text-gray-800">
+        Search Results: {data.length}
+      </p>
+
+      <button
+        onClick={() => setOpenFilter(true)}
+        className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg"
+      >
+        Filter
+      </button>
+    </div>
+
+    {/* ================= DESKTOP SIDEBAR ================= */}
+    <aside className="hidden md:block md:w-64 bg-white p-5 border rounded-xl shadow-sm sticky top-24 h-fit">
+
+      {/* SORT */}
+      <h3 className="text-sm font-semibold uppercase text-gray-500 border-b pb-2">
+        Sort By
+      </h3>
+
+      <form className="text-sm flex flex-col gap-3 py-4">
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="radio"
+            value="asc"
+            checked={sortBy === "asc"}
+            onChange={handleOnChangeSortBy}
+            className="accent-red-600"
+          />
+          Price - Low to High
+        </label>
+
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="radio"
+            value="dsc"
+            checked={sortBy === "dsc"}
+            onChange={handleOnChangeSortBy}
+            className="accent-red-600"
+          />
+          Price - High to Low
+        </label>
+      </form>
+
+      {/* CATEGORY */}
+      <h3 className="text-sm font-semibold uppercase text-gray-500 border-b pb-2 mt-4">
+        Category
+      </h3>
+
+      <form className="text-sm flex flex-col gap-3 py-4 max-h-60 overflow-y-auto">
+        {productCategory.map((cat, index) => (
+          <label
+            key={cat?.value || index}
+            className="flex items-center gap-3 cursor-pointer hover:text-red-600"
+          >
+            <input
+              type="checkbox"
+              value={cat?.value}
+              checked={selectCategory[cat?.value] || false}
+              onChange={handleSelectCategory}
+              className="accent-red-600"
+            />
+            {cat?.label}
+          </label>
+        ))}
+      </form>
+    </aside>
+
+    {/* ================= PRODUCT SECTION ================= */}
+    <main className="flex-1">
+
+      {/* Desktop result count */}
+      <div className="hidden md:flex justify-between items-center mb-5">
+        <p className="font-semibold text-gray-800 text-lg">
+          Search Results: {data.length}
+        </p>
+      </div>
+
+      {loading && (
+        <div className="text-center py-10 text-gray-500">
+          Loading products...
+        </div>
+      )}
+
+      {!loading && data.length === 0 && (
+        <div className="text-center py-10 text-gray-500">
+          No products found
+        </div>
+      )}
+
+      {!loading && data.length > 0 && (
+        <VerticalCard data={data} loading={loading} />
+      )}
+    </main>
+
+  </div>
+
+  {/* ================= MOBILE FILTER PANEL ================= */}
+ {openFilter && (
+  <div className="fixed inset-0 z-50 md:hidden">
+
+    {/* BACKDROP */}
+    <div
+      className="absolute inset-0 bg-black/40"
+      onClick={() => setOpenFilter(false)}
+    />
+
+    {/* COMPACT FILTER PANEL */}
+    <div
+      className="
+       absolute top-15 left-1/2 -translate-x-1/2
+    w-[92%] max-w-sm
+    bg-white
+    rounded-xl
+    h-[45vh]
+    flex flex-col
+    shadow-xl"
+    
+    >
+
+      {/* HEADER */}
+      <div className="flex justify-between items-center px-4 py-2 border-b">
+        <h3 className="text-sm font-semibold">Filters</h3>
+        <button
+          onClick={() => setOpenFilter(false)}
+          className="text-xs text-red-600"
+        >
+          Close
+        </button>
+      </div>
+
+      {/* BODY */}
+      <div className="flex-1 overflow-y-auto px-4 py-2 text-xs">
+
+        {/* SORT */}
+        <p className="text-[11px] font-semibold text-gray-500 border-b pb-1 text-center">
+          SORT BY
+        </p>
+
+        <form className="flex flex-col gap-2 py-2">
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              value="asc"
+              checked={sortBy === "asc"}
+              onChange={handleOnChangeSortBy}
+              className="accent-red-600 scale-90"
+            />
+            Price - Low to High
+          </label>
+
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              value="dsc"
+              checked={sortBy === "dsc"}
+              onChange={handleOnChangeSortBy}
+              className="accent-red-600 scale-90"
+            />
+            Price - High to Low
+          </label>
+        </form>
+
+        {/* CATEGORY */}
+        <p className="text-[11px] font-semibold text-gray-500 border-b pb-1 mt-2 text-center">
+          CATEGORY
+        </p>
+
+        <form className="flex flex-col gap-2 py-2">
+          {productCategory.map((cat, index) => (
+            <label
+              key={cat?.value || index}
+              className="flex items-center gap-2"
+            >
               <input
-                type="radio"
-                value="asc"
-                checked={sortBy === "asc"}
-                onChange={handleOnChangeSortBy}
-                className="accent-red-600"
+                type="checkbox"
+                value={cat?.value}
+                checked={selectCategory[cat?.value] || false}
+                onChange={handleSelectCategory}
+                className="accent-red-600 scale-90"
               />
-              Price - Low to High
+              {cat?.label}
             </label>
+          ))}
+        </form>
+      </div>
 
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="radio"
-                value="dsc"
-                checked={sortBy === "dsc"}
-                onChange={handleOnChangeSortBy}
-                className="accent-red-600"
-              />
-              Price - High to Low
-            </label>
-          </form>
-
-          {/* CATEGORY */}
-          <h3 className="text-sm font-semibold uppercase text-gray-500 border-b pb-2 mt-4">
-            Category
-          </h3>
-
-          <form className="text-sm flex flex-col gap-3 py-4 max-h-60 overflow-y-auto">
-            {productCategory.map((cat, index) => (
-              <label
-                key={cat?.value || index}
-                className="flex items-center gap-3 cursor-pointer hover:text-red-600 transition"
-              >
-                <input
-                  type="checkbox"
-                  value={cat?.value}
-                  checked={selectCategory[cat?.value] || false}
-                  onChange={handleSelectCategory}
-                  className="accent-red-600"
-                />
-                {cat?.label}
-              </label>
-            ))}
-          </form>
-        </aside>
-
-        {/* PRODUCT SECTION */}
-        <main className="flex-1">
-          <div className="flex justify-between items-center mb-5">
-            <p className="font-semibold text-gray-800 text-base md:text-lg">
-              Search Results: {data.length}
-            </p>
-          </div>
-
-          {loading && (
-            <div className="text-center py-10 text-gray-500">
-              Loading products...
-            </div>
-          )}
-
-          {!loading && data.length === 0 && (
-            <div className="text-center py-10 text-gray-500">
-              No products found
-            </div>
-          )}
-
-          {!loading && data.length > 0 && (
-            <VerticalCard data={data} loading={loading} />
-          )}
-        </main>
-
+      {/* FOOTER */}
+      <div className="border-t px-4 py-2">
+        <button
+          onClick={() => setOpenFilter(false)}
+          className="w-full bg-red-600 text-white text-xs py-2 rounded-md"
+        >
+          Apply Filters
+        </button>
       </div>
     </div>
-  );
-};
+  </div>
+)}
+</div>
 
+  )}
 export default CategoryProduct;
