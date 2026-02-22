@@ -174,7 +174,9 @@ const validData = data.filter(item => item.productId !== null);
                 {/* ACTIONS */}
                 <div className="flex flex-col items-center gap-2">
                   <button
-                    onClick={() => deleteCartProduct(product._id)}
+                    onClick={(e) =>{ 
+                       e.stopPropagation()
+                       deleteCartProduct(product._id)}}
                     className="text-red-600 text-sm"
                   >
                     <MdDelete />
@@ -182,7 +184,9 @@ const validData = data.filter(item => item.productId !== null);
 
                   <div className="flex items-center gap-1">
                     <button
-                      onClick={() => decraseQty(product._id, product.quantity)}
+                      onClick={(e) =>{
+                         e.stopPropagation()
+                          decraseQty(product._id, product.quantity)}}
                       className="w-6 h-6 border border-red-600 rounded text-red-600 text-sm"
                     >
                       −
@@ -191,7 +195,9 @@ const validData = data.filter(item => item.productId !== null);
                     <span className="text-sm">{product.quantity}</span>
 
                     <button
-                      onClick={() => increaseQty(product._id, product.quantity)}
+                      onClick={(e) => {
+                         e.stopPropagation()
+                         increaseQty(product._id, product.quantity)}}
                       className="w-6 h-6 border border-red-600 rounded text-red-600 text-sm"
                     >
                       +

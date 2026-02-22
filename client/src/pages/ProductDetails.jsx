@@ -34,6 +34,13 @@ const ProductDetails = () => {
   const { fetchUserAddToCart } = useContext(Context)
 
   const navigate = useNavigate()
+  
+  useEffect(() => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth", // optional
+  });
+}, []);
 
   const fetchProductDetails = async()=>{
     setLoading(true)

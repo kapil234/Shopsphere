@@ -46,9 +46,7 @@ const Header = () => {
           alt="ShopSphere"
           className="w-[80px] sm:w-[110px] md:w-[130px] h-auto"
         />
-        <span className="hidden sm:block font-semibold text-lg md:text-xl text-gray-800">
-          ShopSphere
-        </span>
+       
       </Link>
 
       {/* ================= CENTER : SEARCH ================= */}
