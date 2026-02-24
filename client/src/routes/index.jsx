@@ -68,6 +68,10 @@ const router = createBrowserRouter([
                         path : "all-products",
                         element : <AllProducts/>
                     },
+                    {
+        path: "*",
+        element: <Home /> // or your custom 404 page
+      }
                    
                 ]
             },
