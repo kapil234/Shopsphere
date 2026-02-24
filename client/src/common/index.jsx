@@ -1,5 +1,5 @@
 
-const backendDomin = import.meta.env.BACKEND;
+const backendDomin = import.meta.env.VITE_BACKEND_URL;
 const SummaryApi = {
     signUP : {
         url : `${backendDomin}/api/signup`,
