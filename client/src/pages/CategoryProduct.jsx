@@ -8,26 +8,25 @@ const CategoryProduct = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [sortBy, setSortBy] = useState("");
+  const [openFilter, setOpenFilter] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
 
   // Get category from URL
   const urlSearch = new URLSearchParams(location.search);
-  const urlCategoryListinArray = urlSearch.getAll("category");
+  const urlCategoryList = urlSearch.getAll("category");
 
-  const urlCategoryListObject = {};
-  urlCategoryListinArray.forEach((el) => {
-    urlCategoryListObject[el] = true;
+  const initialCategoryObject = {};
+  urlCategoryList.forEach((el) => {
+    initialCategoryObject[el] = true;
   });
 
   const [selectCategory, setSelectCategory] = useState(
-    urlCategoryListObject
+    initialCategoryObject
   );
-  const [filterCategoryList, setFilterCategoryList] = useState([]);
-  const [openFilter, setOpenFilter] = useState(false);
 
-  // Fetch Products
+  // ================= FETCH PRODUCTS =================
   const fetchData = async (categories) => {
     try {
       setLoading(true);
@@ -46,12 +45,13 @@ const CategoryProduct = () => {
       setData(dataResponse?.data || []);
     } catch (error) {
       console.log("Fetch Error:", error);
+      setData([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle category checkbox
+  // ================= HANDLE CATEGORY SELECT =================
   const handleSelectCategory = (e) => {
     const { value, checked } = e.target;
 
@@ -61,45 +61,49 @@ const CategoryProduct = () => {
     }));
   };
 
-  // Update filter category list when checkbox changes
-  useEffect(() => {
-    const arrayOfCategory = Object.keys(selectCategory)
-      .filter((key) => selectCategory[key]);
-
-    setFilterCategoryList(arrayOfCategory);
-
-    // Update URL
-    const queryParams = new URLSearchParams();
-    arrayOfCategory.forEach((cat) =>
-      queryParams.append("category", cat)
-    );
-
-    navigate(`/product-category?${queryParams.toString()}`);
-  }, [selectCategory]);
-
-  // Fetch products when category changes
-  useEffect(() => {
-    fetchData(filterCategoryList);
-  }, [filterCategoryList]);
-
-  // Handle sorting
+  // ================= HANDLE SORT =================
   const handleOnChangeSortBy = (e) => {
     const { value } = e.target;
     setSortBy(value);
 
-    if (value === "asc") {
-      setData((prev) =>
-        [...prev].sort((a, b) => a.sellingPrice - b.sellingPrice)
-      );
-    }
+    setData((prev) => {
+      const sorted = [...prev];
 
-    if (value === "dsc") {
-      setData((prev) =>
-        [...prev].sort((a, b) => b.sellingPrice - a.sellingPrice)
-      );
-    }
+      if (value === "asc") {
+        sorted.sort((a, b) => a.sellingPrice - b.sellingPrice);
+      }
+
+      if (value === "dsc") {
+        sorted.sort((a, b) => b.sellingPrice - a.sellingPrice);
+      }
+
+      return sorted;
+    });
   };
 
+  // ================= MAIN EFFECT =================
+  useEffect(() => {
+    const selected = Object.keys(selectCategory).filter(
+      (key) => selectCategory[key]
+    );
+
+    // Update URL
+    const queryParams = new URLSearchParams();
+    selected.forEach((cat) => {
+      queryParams.append("category", cat);
+    });
+
+    navigate(`/product-category?${queryParams.toString()}`, {
+      replace: true,
+    });
+
+    // Fetch only if category exists
+    if (selected.length > 0) {
+      fetchData(selected);
+    } else {
+      setData([]);
+    }
+  }, [selectCategory]);
   return (
     <div className="w-full px-4 md:px-8 py-6">
   <div className="flex flex-col md:flex-row gap-6">
