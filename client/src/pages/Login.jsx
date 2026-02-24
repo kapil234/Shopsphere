@@ -59,7 +59,7 @@ const Login = () => {
     
   return (
     <section id='login'>
-        <div className='mx-auto container p-4'>
+        <div className='w-full p-4'>
 
             <div className='bg-white p-5 w-full max-w-sm mx-auto'>
                     <div className='w-20 h-20 mx-auto'>

@@ -1,5 +1,5 @@
 
-const backendDomin = "https://shopsphere-backend-0mes.onrender.com"
+const backendDomin ="http://localhost:8080" ;
 const SummaryApi = {
     signUP : {
         url : `${backendDomin}/api/signup`,
