@@ -1,5 +1,5 @@
 
-const backendDomin ="http://localhost:8080" ;
+const backendDomin = import.meta.env.BACKEND;
 const SummaryApi = {
     signUP : {
         url : `${backendDomin}/api/signup`,
