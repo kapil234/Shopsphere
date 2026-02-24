@@ -2,7 +2,7 @@ const addToCartModel = require("../../models/cartProduct")
 
 const deleteAddToCartProduct = async(req,res)=>{
     try{
-        const currentUserId = req.userId 
+       
         const addToCartProductId = req.body._id
 
         const deleteProduct = await addToCartModel.deleteOne({ _id : addToCartProductId})
