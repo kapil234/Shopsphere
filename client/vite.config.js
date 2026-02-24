@@ -6,6 +6,7 @@ import envCompatible from 'vite-plugin-env-compatible'
 
 // https://vite.dev/config/
 export default defineConfig({
+   base: "/",
   plugins: [react(),
      tailwindcss(),
     envCompatible()],
